@@ -9,36 +9,3 @@ LIBS =  -lpthread -lm -lrt
 AM_CPPFLAGS=
 bin_PROGRAMS = kalign
 
-kalign_SOURCES = run_kalign.c \
-tldevel.h \
-tldevel.c \
-rng.h \
-rng.c \
-global.h \
-msa.h \
-parameters.h \
-parameters.c \
-aln_data.h \
-aln_data.c \
-alphabet.h \
-alphabet.c \
-alignment_parameters.h \
-alignment_parameters.c \
-pick_anchor.h \
-pick_anchor.c \
-bisectingKmeans.h \
-bisectingKmeans.c \
-sequence_distance.h \
-sequence_distance.c \
-euclidean_dist.h \
-euclidean_dist.c \
-alignment.h \
-alignment.c \
-weave_alignment.h \
-weave_alignment.c \
-rwalign.c \
-misc.h \
-misc.c \
-bpm.h \
-bpm.c
-
