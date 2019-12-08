@@ -49,7 +49,7 @@ struct msa{
         int num_profiles;
         int alloc_numseq;
         int aligned;
-        int letter_freq[128];
+        int letter_freq[128]; // leo:: used only to detect dna/prot/aligned (can be removed)
         int L;
 
 

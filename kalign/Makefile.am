@@ -17,6 +17,7 @@ sequence_distance.h \
 euclidean_dist.h \
 alignment.h \
 weave_alignment.h \
+rwalign.c \
 misc.h \
 bpm.h
 

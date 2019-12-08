@@ -35,17 +35,15 @@ struct kalign_sequence{
         int id;
 };
 
-
 struct kalign_alignmment{
         struct kalign_sequence** s_arr;
-        int numseq;
+        int numseq; /**< number of sequences */
         int alloc_numseq;
 };
 
 extern struct kalign_alignmment* kalign_aln_alloc(void);
 extern int kalign_alignment_resize(struct kalign_alignmment* aln);
 extern void kalign_alignmment_free(struct kalign_alignmment* aln);
-
 
 extern int kalign_seq_resize(struct kalign_sequence* ks);
 
