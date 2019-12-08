@@ -1,13 +1,9 @@
 #ifndef libtldevel_included
-
 #define libtldevel_included
-
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -605,7 +601,7 @@ extern void free_checkpoint(struct checkpoint* chk);
 
 
 extern char* shorten_pathname(char* p);
-extern char* basename(const char* name);
+//extern char* basename(const char* name);
 
 extern int replace_punctuation_with_underscore(char* p);
 

@@ -19,9 +19,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
-
 #ifndef ALIGN_IO_H
 #define ALIGN_IO_H
+#include <biomcmc.h>
 #include <unistd.h>
 #include "parameters.h"
 #define SEEK_START 0

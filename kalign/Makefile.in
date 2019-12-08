@@ -319,7 +319,24 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = $(GTKDEPS_CFLAGS)  -I$(srcdir)/../@BIOMCMCLIB@/lib  @OPENMP_CPPFLAGS@ @ZLIB_LIBS@
 LDADD = $(GTKDEPS_LIBS) @ZLIB_LIBS@ ../biomcmc-lib/lib/libbiomcmc.la  $(AM_LDFLAGS)
-common_headers = 
+common_headers = kalign.h \
+tldevel.h \
+rng.h \
+global.h \
+msa.h \
+parameters.h \
+aln_data.h \
+alphabet.h \
+alignment_parameters.h \
+pick_anchor.h \
+bisectingKmeans.h \
+sequence_distance.h \
+euclidean_dist.h \
+alignment.h \
+weave_alignment.h \
+misc.h \
+bpm.h
+
 common_src = run_kalign.c \
 tldevel.c \
 rng.c \
@@ -681,22 +698,6 @@ uninstall-am:
 
 .PRECIOUS: Makefile
 
-tldevel.h \
-rng.h \
-global.h \
-msa.h \
-parameters.h \
-aln_data.h \
-alphabet.h \
-alignment_parameters.h \
-pick_anchor.h \
-bisectingKmeans.h \
-sequence_distance.h \
-euclidean_dist.h \
-alignment.h \
-weave_alignment.h \
-misc.h \
-bpm.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

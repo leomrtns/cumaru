@@ -1,3 +1,3 @@
 EXTRA_DIST = recipe 
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = @BIOMCMCLIB@ src kalign 
+SUBDIRS = @BIOMCMCLIB@ kalign src 

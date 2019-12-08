@@ -20,12 +20,11 @@
 
 */
 
+#include <biomcmc.h>
 #include "global.h"
 #include "msa.h"
 #include "parameters.h"
-//#include "align_io.h"
 #include "alignment_parameters.h"
-
 #include "bisectingKmeans.h"
 #include "alignment.h"
 #include "weave_alignment.h"
