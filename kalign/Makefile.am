@@ -2,7 +2,7 @@ AM_CPPFLAGS = $(GTKDEPS_CFLAGS)  -I$(srcdir)/../@BIOMCMCLIB@/lib  @OPENMP_CPPFLA
 AM_CFLAGS = @AM_CFLAGS@  @OPENMP_CFLAGS@
 LDADD = $(GTKDEPS_LIBS) @ZLIB_LIBS@ ../biomcmc-lib/lib/libbiomcmc.la  $(AM_LDFLAGS)
 
-common_headers = 
+common_headers = kalign.h \
 tldevel.h \
 rng.h \
 global.h \

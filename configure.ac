@@ -28,7 +28,7 @@ AC_SUBST(OPENMP_CFLAGS)
 AC_SUBST(OPENMP_CPPFLAGS)
 PKG_CHECK_MODULES([CHECK], [check >= 0.9.10]) # unit tests in for "make check"
 PKG_CHECK_MODULES([ZLIB], [zlib])
-AC_MSG_RESULT([ ===  configuration options specific to kumaru]) # library checks (math etc.) are done by biomcmc-lib
+AC_MSG_RESULT([ ===  configuration options specific to $PACKAGE_NAME]) # library checks (math etc.) are done by biomcmc-lib
 
 AC_MSG_CHECKING([whether to build (slower) debug code])
 AC_ARG_ENABLE([debug], [AS_HELP_STRING([--enable-debug], [enable debugging with gdb and friends (default=no)])],[debugit="$enableval"], [debugit=no])
@@ -71,7 +71,7 @@ AC_OUTPUT
 
 echo \
 "---- 
-Configuration parameters for amburana:
+Configuration parameters for $PACKAGE_NAME-$PACKAGE_VERSION:
 
  Source code location:   ${srcdir}
  Compiler     (library): ${CC}
