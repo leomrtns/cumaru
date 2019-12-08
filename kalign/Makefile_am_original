@@ -1,0 +1,44 @@
+# Build the library in the hand subdirectory first.
+ACLOCAL_AMFLAGS = -I m4
+
+AM_CFLAGS =  @SIMD_FLAGS@ @OPENMP_CFLAGS@ 
+# top_builddir = @top_builddir@
+AM_LDFLAGS = @DEAD_STRIP@
+AM_LDFLAGS += -Wno-undef
+LIBS =  -lpthread -lm -lrt
+AM_CPPFLAGS=
+bin_PROGRAMS = kalign
+
+kalign_SOURCES = run_kalign.c \
+tldevel.h \
+tldevel.c \
+rng.h \
+rng.c \
+global.h \
+msa.h \
+parameters.h \
+parameters.c \
+aln_data.h \
+aln_data.c \
+alphabet.h \
+alphabet.c \
+alignment_parameters.h \
+alignment_parameters.c \
+pick_anchor.h \
+pick_anchor.c \
+bisectingKmeans.h \
+bisectingKmeans.c \
+sequence_distance.h \
+sequence_distance.c \
+euclidean_dist.h \
+euclidean_dist.c \
+alignment.h \
+alignment.c \
+weave_alignment.h \
+weave_alignment.c \
+rwalign.c \
+misc.h \
+misc.c \
+bpm.h \
+bpm.c
+
