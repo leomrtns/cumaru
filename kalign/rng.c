@@ -10,21 +10,6 @@
 /* Sebastiano Vigna (vigna@acm.org) */
 /* David Blackman */
 
-#ifdef ITESTRNG
-int main(int argc, char *argv[])
-{
-        struct rng_state* rng = NULL;
-        int i;
-        RUNP(rng = init_rng(0));
-        for(i = 0; i < 10;i++){
-                fprintf(stdout,"%f\t%d\n", tl_random_double(rng), tl_random_int(rng,10));
-        }
-        free_rng(rng);
-        return EXIT_SUCCESS;
-ERROR:
-        return EXIT_FAILURE;
-}
-#endif
 
 static inline uint64_t rotl(const uint64_t x, int k);
 uint64_t next(struct rng_state* s);

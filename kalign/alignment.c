@@ -22,9 +22,8 @@
 
 #include <xmmintrin.h>
 #include "alignment.h"
+#include "alignment_parameters.h"
 
-#include "pick_anchor.h"
-#define MAX(a, b) (a > b ? a : b)
 #define MAX3(a,b,c) MAX(MAX(a,b),c)
 
 struct states{

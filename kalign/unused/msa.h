@@ -61,9 +61,8 @@ int dealign_msa(struct msa* msa);
 
 
 /* convert */
-int convert_msa_to_internal(struct msa* msa, int type);
+int convert_msa_to_internal(struct msa* msa);
 /* rw functions */
-
 struct msa* read_input(char* infile,struct msa* msa);
 int write_msa(struct msa* msa, char* outfile, int type);
 void free_msa(struct msa* msa);

@@ -6,18 +6,12 @@ common_headers = kalign.h \
 tldevel.h \
 rng.h \
 global.h \
-msa.h \
 parameters.h \
-aln_data.h \
-alphabet.h \
 alignment_parameters.h \
-pick_anchor.h \
 bisectingKmeans.h \
 sequence_distance.h \
 euclidean_dist.h \
 alignment.h \
-weave_alignment.h \
-rwalign.c \
 misc.h \
 bpm.h
 
@@ -25,16 +19,11 @@ common_src = run_kalign.c \
 tldevel.c \
 rng.c \
 parameters.c \
-aln_data.c \
-alphabet.c \
 alignment_parameters.c \
-pick_anchor.c \
 bisectingKmeans.c \
 sequence_distance.c \
 euclidean_dist.c \
 alignment.c \
-weave_alignment.c \
-rwalign.c \
 misc.c \
 bpm.c
 

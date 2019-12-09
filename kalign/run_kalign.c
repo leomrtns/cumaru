@@ -11,49 +11,34 @@
 
 #include <biomcmc.h>
 #include "global.h"
-#include "msa.h"
 #include "parameters.h"
 #include "alignment_parameters.h"
 #include "bisectingKmeans.h"
 #include "alignment.h"
-#include "weave_alignment.h"
 #include "misc.h"
-#include "alphabet.h"
 
-
-int run_kalign(struct parameters* param)
+char_vector kalign3_from_char_vector (char_vector dna)
 {
   struct msa* msa = NULL;
   struct aln_param* ap = NULL;
   int** map = NULL; /* holds all alignment paths  */
   int i;
+  char_vector aligned_charvector = NULL;
 
   /* Step 1: read all input sequences & figure out output  */
-  for(i = 0; i < param->num_infiles;i++){ RUNP(msa = read_input(param->infile[i],msa)); }
-  LOG_MSG("Detected: %d sequences.", msa->numseq);
-
-  /* allocate aln parameters  */
-  RUNP(ap = init_ap(msa->numseq,msa->L ));
+  msa = read_char_vector_to_msa (dna);
+  ap = init_ap (msa->numseq);/* allocate aln parameters  */
   /* Start bi-secting K-means sequence clustering */
-  RUN(build_tree_kmeans(msa,ap));
-  convert_msa_to_internal(msa, defDNA); // from "detect_alphabet"
+  build_tree_kmeans(msa,ap);
   /* Start alignment stuff */
-  RUNP(map = hirschberg_alignment(msa, ap));
-  /* set to aligned */
-  msa->aligned = 1;
-  RUN(weave(msa , map, ap->tree));
+  map = hirschberg_alignment(msa, ap);
+  weave(msa , map, ap->tree); /* it's aligned already */
   /* clean up map */
-  for(i = 0; i < msa->num_profiles ;i++){ if(map[i]) MFREE(map[i]); }
-  MFREE(map);
-  map = NULL;
+  for (i = 0; i < msa->num_profiles ;i++) if(map[i]) free (map[i]); 
+  if (map) free (map);
   /* We are done. */
-  RUN(write_msa(msa, param->outfile, param->out_format));
-
+  aligned_charvector = aligned_msa_to_charvector (msa);
   free_msa(msa);
   free_ap(ap);
-  return OK;
-  free_parameters(param);
-ERROR:
-  return FAIL;
-  free_parameters(param);
+  return aligned_charvector;
 }

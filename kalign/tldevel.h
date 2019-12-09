@@ -112,12 +112,6 @@ extern void message(const char *location, const char *format, ...);
 extern int log_command_line(const int argc,char* const argv[]);
 extern char* make_cmd_line(const int argc,char* const argv[]);
 
-extern char build_config[];
-extern int print_program_header(char* const argv[],const char* description);
-//extern void echo_build_config (void);
-
-
-
 #define ERROR_MSG(...) do {                     \
                 error(AT, __VA_ARGS__ );        \
                 goto ERROR;                     \
@@ -137,10 +131,15 @@ extern int print_program_header(char* const argv[],const char* description);
         }while (0)
 
 
-#define ASSERT(TEST,...)  if(!(TEST)) {         \
+#define ASSERT_GOTO(TEST,...)  if(!(TEST)) {    \
                 error(AT,#TEST );               \
                 error(AT, ##__VA_ARGS__);       \
                 goto ERROR;                     \
+        }
+
+#define ASSERT(TEST,...)  if(!(TEST)) {         \
+                error(AT,#TEST );               \
+                error(AT, ##__VA_ARGS__);       \
         }
 
 #define ADDFAILED(x)  "Function \"" TOSTRING(x) "\" failed."
@@ -561,10 +560,6 @@ struct checkpoint{
 /* extern char build_config[]; */
 
 float logsum_lookup[LOGSUM_SIZE];
-
-
-extern int print_program_header(char * const argv[],const char* description);
-
 
 extern int get_time(char* time_ptr, int size);
 extern int my_file_exists(char* name);

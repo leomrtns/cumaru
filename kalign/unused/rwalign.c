@@ -3,6 +3,8 @@
  * This file is part of cumaru, a multiple sequence alignment.
  */
 
+#include "rwalign.h"
+
 /* only local; */
 struct line_buffer{
   struct out_line** lines;
@@ -52,7 +54,7 @@ struct msa* read_input(char* infile, struct msa* msa)
   }
 
   RUNP(msa = read_fasta(infile,msa));
-  RUN(convert_msa_to_internal(msa, defDNA));
+  RUN(convert_msa_to_internal(msa));
   msa->aligned = 0;
   RUN(set_sip_nsip(msa));
 
@@ -96,7 +98,7 @@ ERROR:
   return FAIL;
 }
 
-int convert_msa_to_internal(struct msa* msa, int type)
+int convert_msa_to_internal(struct msa* msa)
 {
   struct alphabet* a = NULL;
   struct msa_seq* seq = NULL;

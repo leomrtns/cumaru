@@ -24,8 +24,6 @@
 #define SEQUENCE_DISTANCE_H
 
 #include "global.h"
-#include "msa.h"
-
 #include "alignment_parameters.h"
 
 extern float** d_estimation(struct msa* msa, int* samples, int num_samples,int pair);
