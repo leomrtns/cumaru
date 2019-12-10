@@ -7,8 +7,14 @@
 #define ALIGNMENT_PARAMETERS_H
 
 #include <biomcmc.h>
+#include <float.h>
 #include "global.h"
-#include "misc.h"
+#include "tldevel.h"
+#include "rng.h"
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #define MSA_NAME_LEN 128
 #define FORMAT_FA 1
@@ -18,12 +24,13 @@
 #define redPROTEIN 13
 #define defDNA 5
 
+
 struct msa_seq {
   char* seq;
   uint32_t id; // leo: we don't store seq names here, external char_vector should have it
   uint8_t* s;
-  int* gaps;
-  int len;
+  uint32_t* gaps;
+  uint32_t len;
 };
 
 struct msa {
@@ -31,8 +38,8 @@ struct msa {
   int** sip;
   int* nsip;
   int* plen;
-  int numseq;
-  int num_profiles;
+  uint32_t numseq;
+  uint32_t num_profiles;
 };
 
 struct aln_param {
@@ -71,5 +78,18 @@ int clean_aln(struct msa* msa);
 extern  int edist_256(const float* a,const float* b, const int len, float* ret);
 extern int edist_serial(const float* a,const float* b,const int len, float* ret);
 extern int edist_serial_d(const double* a,const double* b,const int len, double* ret);
+
+
+extern int byg_detect(uint8_t* text,int n);
+extern int byg_start(char* pattern,char*text);
+extern int byg_end(char* pattern,char*text);
+extern int byg_count(char* pattern,char*text);
+extern int shuffle_arr_r(int* arr,int n, struct rng_state* rng);
+/* Steinegger, Martin, and Johannes Söding. "Clustering huge protein sequence sets in linear time." Nature communications 9.1 (2018): 2542. */
+// (c) 2017 Johannes Soeding & Martin Steinegger, Gnu Public License version 3
+uint16_t circ_hash(const uint8_t* x, const uint8_t length);
+uint16_t circ_hash_next(const uint8_t * x,const uint8_t length,const uint8_t x_first, uint16_t h);
+// kmeans.h
+double** kmeans(double** data,int* cluster_assignment, int len_a,int len_b, int k);
 
 #endif

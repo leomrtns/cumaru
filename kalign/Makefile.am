@@ -10,7 +10,6 @@ alignment_parameters.h \
 bisectingKmeans.h \
 sequence_distance.h \
 alignment.h \
-misc.h \
 bpm.h
 
 common_src = run_kalign.c \
@@ -20,7 +19,6 @@ alignment_parameters.c \
 bisectingKmeans.c \
 sequence_distance.c \
 alignment.c \
-misc.c \
 bpm.c
 
 noinst_LTLIBRARIES = libkalign.la   ## change to noinst_LT... if should be linked statically (not installed globally)

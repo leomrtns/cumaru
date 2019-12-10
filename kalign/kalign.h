@@ -16,8 +16,6 @@
 #include "bisectingKmeans.h"
 #include "bpm.h"
 #include "global.h"
-#include "kmeans.h"
-#include "misc.h"
 #include "rng.h"
 #include "sequence_distance.h"
 #include "tldevel.h"

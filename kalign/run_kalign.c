@@ -14,7 +14,6 @@
 #include "alignment_parameters.h"
 #include "bisectingKmeans.h"
 #include "alignment.h"
-#include "misc.h"
 
 char_vector kalign3_from_char_vector (char_vector dna)
 {

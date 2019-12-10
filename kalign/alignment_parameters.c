@@ -3,10 +3,11 @@
  * This file is part of cumaru, a multiple sequence alignment.
  */
 
-#include "alignment_parameters.h"
-#include "rng.h"
 #include <xmmintrin.h>
 #include <immintrin.h>
+#include <stdalign.h>
+#include "alignment_parameters.h"
+#include "rng.h"
 #include "float.h"
 
 struct sort_struct{
@@ -596,3 +597,227 @@ float hsum_ps_sse3(__m128 v)
 }
 
 #endif
+// misc.c
+
+int byg_detect(uint8_t* text,int n)
+{
+  int Tc;
+  int i  = 0;
+  int s = 0;
+  int T[256];
+  for (i = 0;i < 256;i++) T[i] = 0;
+  int mb = 1;
+  char *unique_aa = "BDEFHIJKLMNOPQRSVWYZ";//restrictive
+  int aacode[26] = {0,1,2,3,4,5,6,7,8,-1,9,10,11,12,23,13,14,15,16,17,17,18,19,20,21,22};
+  for (i= 0;i < 20;i++){
+    T[(int)aacode[unique_aa[i]-65]] |= 1;
+  }
+  for (i = 0;i < n;i++) if(text[i] != -1){
+    s <<= 1;
+    s |= 1;
+    Tc = T[text[i]];
+    s &= Tc;
+    if(s & mb) return 0;
+  }
+  return 1;
+}
+
+int byg_count(char* pattern,char*text)
+{
+  int Tc;
+  int count = 0;
+  int i  = 0;
+  int s = 0;
+  int T[256];
+  for (i = 0;i < 256;i++) T[i] = 0;
+  int m = strlen(pattern);
+  int n = strlen (text);
+  int mb = (1 << (m-1));
+  for (i= 0;i < m;i++) T[(int)pattern[i]] |= (1 << i);
+  for (i = 0;i < n;i++){
+    s <<= 1;
+    s |= 1;
+    Tc = T[(int)text[i]];
+    s &= Tc;
+    if(s & mb) count++;
+  }
+  return count;
+}
+
+int byg_end(char* pattern,char*text)
+{
+  int Tc;
+  int i  = 0;
+  int s = 0;
+  int T[256];
+  for (i = 0;i < 256;i++) T[i] = 0;
+  int m = strlen(pattern);
+  int n = strlen (text);
+  int mb = (1 << (m-1));
+  for (i= 0;i < m;i++) T[(int)pattern[i]] |= (1 << i);
+  for (i = 0;i < n;i++){
+    s <<= 1;
+    s |= 1;
+    if(!text[i]) return -1;
+    Tc = T[(int)text[i]];
+    s &= Tc;
+    if(s & mb) return i+1;
+  }
+  return -1;
+}
+
+int byg_start(char* pattern,char*text)
+{
+  int Tc;
+  int i  = 0;
+  int s = 0;
+  int T[256];
+  for (i = 0;i < 256;i++) T[i] = 0;
+  int m = strlen(pattern);
+  int n = strlen(text);
+  int mb = (1 << (m-1));
+  for (i= 0;i < m;i++) T[(int)pattern[i]] |= (1 << i);
+  for (i = 0;i < n;i++) {
+    s <<= 1;
+    s |= 1;
+    Tc = T[(int)text[i]];
+    s &= Tc;
+    if(s & mb) return i-m+1;
+    if(i == 100) return -1;
+  }
+  return -1;
+}
+
+// (c) 2017 Johannes Soeding & Martin Steinegger, Gnu Public License version 3
+// Rotate left macro: left circular shift by numbits within 16 bits
+#define RoL(val, numbits) (val << numbits) ^ (val >> (16 - numbits))
+// Transform each letter x[i] to a fixed random number RAND[x[i]]
+// to ensure instantaneous mixing into the 16 bits  Do XOR with RAND[x[i]] and 5-bit rotate left for each i from 1 to k
+uint16_t circ_hash(const uint8_t* x, const uint8_t length)
+{
+  const uint16_t RAND[21] = {0x4567, 0x23c6, 0x9869, 0x4873, 0xdc51, 0x5cff, 0x944a, 0x58ec,
+    0x1f29, 0x7ccd, 0x58ba, 0xd7ab, 0x41f2, 0x1efb, 0xa9e3, 0xe146, 0x007c, 0x62c2, 0x0854, 0x27f8, 0x231b};// 16 bit random numbers
+  register uint16_t h = 0x0;
+  h = h^ RAND[x[0]];// XOR h and ki
+  for (register uint8_t i = 1; i < length; ++i){
+    h = RoL(h, 5);
+    h ^= RAND[x[i]];// XOR h and ki
+  }
+  return h;
+}
+
+// Rolling hash variant for previous hash function:
+// Computes hash value for next key x[0:length-1] from previous hash value hash( x[-1:length-2] ) and x_first = x[-1]
+uint16_t circ_hash_next(const uint8_t * x,const uint8_t length,const uint8_t x_first, uint16_t h)
+{
+  const uint16_t RAND[21] = {0x4567, 0x23c6, 0x9869, 0x4873, 0xdc51, 0x5cff, 0x944a, 0x58ec,
+    0x1f29, 0x7ccd, 0x58ba, 0xd7ab, 0x41f2, 0x1efb, 0xa9e3, 0xe146, 0x007c, 0x62c2, 0x0854, 0x27f8, 0x231b};// 16 bit random numbers
+  h ^= RoL(RAND[x_first], (5*(length-1)) % 16);// undo INITIAL_VALUE and first letter x[0] of old key
+  // circularly permute all letters x[1:length-1] to 5 positions to left
+  h =  RoL(h, 5);// add new, last letter of new key x[1:length]
+  h ^= RAND[x[length-1]];
+  return h;
+}
+
+int shuffle_arr_r(int* arr,int n, struct rng_state* rng)
+{
+  int r;
+  int i,j;
+  int tmp;
+  for (i = 0; i < n - 1; i++) {
+    r = tl_random_int(rng,n);
+    j = i +  r % (n-i);
+    tmp = arr[j];
+    arr[j] = arr[i];
+    arr[i] = tmp;
+  }
+  return OK;
+}
+
+// kmeans.c
+
+double** kmeans(double** data,int* cluster_assignment, int len_a, int len_b, int k)
+{
+  double** means = NULL;
+  double** tmp = NULL;
+  double** tmp2 = NULL;
+  double** tmp_ptr = NULL;
+  double best_solution;
+  double score;
+  double old_score;
+  double min;
+  double d;
+  int min_index;
+  int i,j;
+  int num_attempts = 10000;
+  int a_item;
+  struct rng_state* rng;
+  int* sel = NULL;
+  double* n_item = NULL;
+  ASSERT(k > 0,"K needs to be greater than one");
+  ASSERT(k < len_a,"K larger than number of items");
+  rng = init_rng(0);
+  sel = galloc(sel,len_a);
+  for(i = 0; i < len_a;i++) sel[i] = i;
+  n_item = galloc(n_item,k);
+  for(i = 0; i < k;i++) n_item[i] = 0.0;
+  tmp = galloc(tmp,k,len_b,0.0f);
+  tmp2= galloc(tmp2,k,len_b,0.0f);
+  means= galloc(means,k,len_b,0.0f);
+  best_solution = DBL_MAX;
+  for(a_item = 0; a_item < num_attempts;a_item++){
+    for(i = 0; i < k;i++) for(j = 0; j < len_b;j++) tmp[i][j] = 0.0;
+    /* shuffle to select first k means */
+    shuffle_arr_r(sel, len_a,rng);
+    /* initial selection  */
+    for(i = 0; i < k;i++) for(j = 0; j < len_b;j++){
+      tmp[i][j] = data[sel[i]][j];
+      tmp2[i][j] = 0.0;
+    }
+    score =1.0;
+    old_score = 0.0;
+    while(score != old_score) {
+      for(i = 0; i < k;i++) n_item[i] = 0.0;
+      for(i = 0; i < k;i++) for(j = 0; j < len_b;j++) tmp2[i][j] = 0.0;
+      score = 0.0;
+      for(i= 0; i < len_a;i++){
+        min = DBL_MAX;
+        min_index = -1;
+        for(j = 0; j < k;j++) {
+          edist_serial_d(data[i], tmp[j], len_b, &d);
+          if(d < min) {
+            min = d;
+            min_index = j;
+          }
+        }
+        n_item[min_index]++;
+        score += min;
+        for(j = 0; j < len_b;j++) tmp2[min_index][j] += data[i][j];
+        if(cluster_assignment) cluster_assignment[i] = min_index;
+      }
+      /* calculate new means  */
+      for(i = 0; i < k;i++) for(j = 0; j < len_b;j++) tmp2[i][j] /= n_item[i];
+      /* switch */
+      tmp_ptr = tmp;
+      tmp= tmp2;
+      tmp2 = tmp_ptr;
+      if(old_score == score) break;
+      old_score = score;
+    }
+
+    if(score < best_solution){
+      fprintf(stdout,"%f better than %f\n", score,best_solution);
+      best_solution = score;
+      for(i = 0; i < k;i++) for(j = 0; j < len_b;j++) means[i][j] = tmp[i][j];
+    }
+  }
+  for(i = 0; i < k;i++) n_item[i] = 0.0;
+  for(i= 0; i < len_a;i++) if(cluster_assignment) n_item[cluster_assignment[i]]++;
+  for(i = 0; i < k;i++) fprintf(stdout,"%d %f\n",i,n_item[i]);
+
+  gfree(tmp);
+  gfree(tmp2);
+  gfree(n_item);
+  gfree(sel);
+  return means;
+}
