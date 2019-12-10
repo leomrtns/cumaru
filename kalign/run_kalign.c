@@ -11,7 +11,6 @@
 
 #include <biomcmc.h>
 #include "global.h"
-#include "parameters.h"
 #include "alignment_parameters.h"
 #include "bisectingKmeans.h"
 #include "alignment.h"

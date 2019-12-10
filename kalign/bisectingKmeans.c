@@ -22,7 +22,6 @@
 
 #include <xmmintrin.h>
 #include "bisectingKmeans.h"
-#include "euclidean_dist.h"
 #include "alignment.h"
 #include "alignment_parameters.h"
 
@@ -52,10 +51,8 @@ int* readbitree(struct node* p,int* tree);
 void printTree(struct node* curr,int depth);
 struct node* bisecting_kmeans(struct msa* msa, struct node* n, float** dm,int* samples,int numseq, int num_anchors,int num_samples,struct rng_state* rng);
 
-
 int build_tree_kmeans(struct msa* msa, struct aln_param* ap)
 {
-  //struct drand48_data randBuffer;
   struct node* root = NULL;
   float** dm = NULL;
   int* tree = NULL;
@@ -67,61 +64,27 @@ int build_tree_kmeans(struct msa* msa, struct aln_param* ap)
   int i;
 
   ASSERT(msa != NULL, "No alignment.");
-  //ASSERT(param != NULL, "No input parameters.");
   ASSERT(ap != NULL, "No alignment parameters.");
-
-
   tree = ap->tree;
-
-
   numseq = msa->numseq;
-
-  DECLARE_TIMER(timer);
-  /* pick anchors . */
-  LOG_MSG("Calculating pairwise distances");
-  START_TIMER(timer);
+  // LOG_MSG("Calculating pairwise distances");
   RUNP(anchors = pick_anchor(msa, &num_anchors));
-
   RUNP(dm = d_estimation(msa, anchors, num_anchors,0));//les,int pair)
-
-  STOP_TIMER(timer);
-
-  LOG_MSG("Done in %f sec.", GET_TIMING(timer));
-
   MFREE(anchors);
-
   MMALLOC(samples, sizeof(int)* numseq);
-  for(i = 0; i < numseq;i++){
-    samples[i] = i;
-  }
-
-
-
-  //RUNP(root = alloc_node());
-
-  START_TIMER(timer);
-
-  LOG_MSG("Building guide tree.");
-
-
+  for(i = 0; i < numseq;i++) samples[i] = i;
+  // LOG_MSG("Building guide tree.");
   RUNP(root = bisecting_kmeans(msa,root, dm, samples, numseq, num_anchors, numseq, ap->rng));
-  STOP_TIMER(timer);
-
-  LOG_MSG("Done in %f sec.", GET_TIMING(timer));
-
+  // LOG_MSG("Done in %f sec.", GET_TIMING(timer));
   label_internal(root, numseq);
-
   ap->tree[0] = 1;
   ap->tree = readbitree(root, ap->tree);
   for (i = 0; i < (numseq*3);i++){
     tree[i] = tree[i+1];
   }
   MFREE(root);
-  for(i =0 ; i < msa->numseq;i++){
-    _mm_free(dm[i]);
-  }
+  for(i =0 ; i < msa->numseq;i++)  _mm_free(dm[i]);
   MFREE(dm);
-
   return OK;
 ERROR:
   return FAIL;
@@ -382,24 +345,15 @@ struct node* upgma(float **dm,int* samples, int numseq)
 
   while (cnode != numprofiles){
     max = FLT_MAX;
-    for (i = 0;i < numseq-1; i++){
-      if (as[i]){
-        for ( j = i + 1;j < numseq;j++){
-          if (as[j]){
-            if (dm[i][j] < max){
-              max = dm[i][j];
-              node_a = i;
-              node_b = j;
-            }
-          }
-        }
-      }
+    for (i = 0;i < numseq-1; i++) if (as[i]) for ( j = i + 1;j < numseq;j++) if (as[j]) if (dm[i][j] < max) {
+      max = dm[i][j];
+      node_a = i;
+      node_b = j;
     }
     tmp = NULL;
     tmp = alloc_node();
     tmp->left = tree[node_a];
     tmp->right = tree[node_b];
-
 
     tree[node_a] = tmp;
     tree[node_b] = NULL;
@@ -410,16 +364,9 @@ struct node* upgma(float **dm,int* samples, int numseq)
     cnode++;
 
     /*calculate new distances*/
-    for (j = numseq;j--;){
-      if (j != node_b){
-        dm[node_a][j] = (dm[node_a][j] + dm[node_b][j])*0.5f;
-
-      }
-    }
+    for (j = numseq;j--;) if (j != node_b) dm[node_a][j] = (dm[node_a][j] + dm[node_b][j])*0.5f;
     dm[node_a][node_a] = 0.0f;
-    for (j = numseq;j--;){
-      dm[j][node_a] = dm[node_a][j];
-    }
+    for (j = numseq;j--;) dm[j][node_a] = dm[node_a][j];
   }
   tmp = tree[node_a];
   MFREE(tree);

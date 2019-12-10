@@ -8,7 +8,6 @@
 
 #include <biomcmc.h>
 #include "global.h"
-#include "parameters.h"
 #include "misc.h"
 
 #define MSA_NAME_LEN 128
@@ -59,12 +58,7 @@ char_vector aligned_msa_to_charvector (struct msa* msa);
 struct aln_param* init_ap (int numseq);
 void free_ap (struct aln_param* ap);
 struct alphabet* create_dna_alphabet (void);
-int* pick_anchor(struct msa* msa, int* n);
-
-struct alignment* detect_and_read_sequences(struct parameters* param);
-int make_dna(struct alignment* aln);
-void free_aln(struct alignment* aln);
-int output (struct alignment* aln,struct parameters* param);
+int* pick_anchor (struct msa* msa, int* n);
 int make_aliged_seq (uint8_t* aligned, uint8_t* unaligned, int* gaps,int len);
 
 void convert_msa_to_internal(struct msa* msa);/* convert */
@@ -73,4 +67,9 @@ void free_msa(struct msa* msa);
 
 int weave(struct msa* msa, int** map, int* tree);
 int clean_aln(struct msa* msa);
+// euclidean_distance.h
+extern  int edist_256(const float* a,const float* b, const int len, float* ret);
+extern int edist_serial(const float* a,const float* b,const int len, float* ret);
+extern int edist_serial_d(const double* a,const double* b,const int len, double* ret);
+
 #endif

@@ -23,13 +23,10 @@
 #ifndef KMEANS_H
 #define KMEANS_H
 
-
 #include <float.h>
 #include "tldevel.h"
-
-
 #include "misc.h"
-#include "euclidean_dist.h"
+#include "alignment_parameters.h"
 
 
 double** kmeans(double** data,int* cluster_assignment, int len_a,int len_b, int k);

@@ -21,6 +21,14 @@ AC_PROG_INSTALL
 AC_GNU_SOURCE # directs the libc header files to provide the standard GNU system interfaces including all GNU extensions
 AC_PROG_LIBTOOL # Libtool (for library): in lib/Makefile.am, we include an "abstract" libfoo.la
 
+# M4 macros for checking of CPU features from kalign3
+m4_include([m4/ax_gcc_x86_avx_xgetbv.m4])
+m4_include([m4/ax_gcc_x86_cpuid.m4])
+m4_include([m4/ax_check_compile_flag.m4])
+m4_include([m4/ax_ext.m4])
+m4_include([m4/ax_openmp.m4])
+AX_EXT
+
 dnl openMP: sets $OPENMP_CFLAGS which should be passed to CFLAGS, CPPFLAGS; creates preprocessor macro _OPENMP 
 dnl         (checked with "ifdef _OPENMP"); user can disable it through "--disable-openmp"
 AC_OPENMP
