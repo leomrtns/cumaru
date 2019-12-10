@@ -65,7 +65,7 @@ char_vector aligned_msa_to_charvector (struct msa* msa);
 struct aln_param* init_ap (int numseq);
 void free_ap (struct aln_param* ap);
 struct alphabet* create_dna_alphabet (void);
-int* pick_anchor (struct msa* msa, int* n);
+uint32_t* pick_anchor (struct msa* msa, int* n);
 int make_aliged_seq (uint8_t* aligned, uint8_t* unaligned, int* gaps,int len);
 
 void convert_msa_to_internal(struct msa* msa);/* convert */

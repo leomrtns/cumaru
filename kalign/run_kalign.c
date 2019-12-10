@@ -20,7 +20,7 @@ char_vector kalign3_from_char_vector (char_vector dna)
   struct msa* msa = NULL;
   struct aln_param* ap = NULL;
   int** map = NULL; /* holds all alignment paths  */
-  int i;
+  uint32_t i;
   char_vector aligned_charvector = NULL;
 
   /* Step 1: read all input sequences & figure out output  */

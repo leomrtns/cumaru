@@ -36,7 +36,7 @@ void set_subm_gaps_DNA(struct aln_param* ap);
 int clean_and_set_to_extern(struct alphabet* a);
 void merge_codes (struct alphabet*a,const int X, const int Y);
 int sort_by_len (const void *a, const void *b);
-int* select_seqs (struct msa* msa, int num_anchor);
+uint32_t* select_seqs (struct msa* msa, uint32_t num_anchor);
 
 /* from rwalign.c */
 void free_msa_seq(struct msa_seq* seq);
@@ -179,23 +179,24 @@ int clean_and_set_to_extern (struct alphabet* a)
 
 // pick_anchor.c
 
-int* pick_anchor(struct msa* msa, int* n)
+uint32_t* pick_anchor(struct msa* msa, int* n)
 {
-  int* anchors = NULL;
-  int num_anchor = 0, powlog2;
+  uint32_t* anchors = NULL;
+  int num_anchor = 0;
+  uint32_t powlog2;
   ASSERT(msa != NULL, "No alignment.");
-  powlog2 = (int) pow(log2((double) msa->numseq), 2.0);
+  powlog2 = (uint32_t) pow(log2((double) msa->numseq), 2.0);
   num_anchor = MAX(MIN(32, msa->numseq), powlog2);
   anchors = select_seqs (msa, num_anchor);
   *n = num_anchor;
   return anchors;
 }
 
-int* select_seqs(struct msa* msa, int num_anchor)
+uint32_t* select_seqs(struct msa* msa, uint32_t num_anchor)
 {
   struct sort_struct** seq_sort = (struct sort_struct**) biomcmc_malloc (sizeof(struct sort_struct*) * msa->numseq);
-  int* anchors = NULL;
-  int i,stride;
+  uint32_t* anchors = NULL;
+  uint32_t i,stride;
   for(i = 0; i < msa->numseq;i++) {
     seq_sort[i] = (struct sort_struct*) biomcmc_malloc (sizeof(struct sort_struct));
     seq_sort[i]->id = i;
@@ -203,7 +204,7 @@ int* select_seqs(struct msa* msa, int num_anchor)
   }
 
   qsort (seq_sort, msa->numseq, sizeof(struct sort_struct*),sort_by_len);
-  anchors = (int*) biomcmc_malloc (sizeof(int) * num_anchor);
+  anchors = (uint32_t*) biomcmc_malloc (sizeof(uint32_t) * num_anchor);
   stride = msa->numseq / num_anchor;
   for(i = 0; i < num_anchor;i++) anchors[i] = seq_sort[i*stride]->id;
   ASSERT(i == num_anchor,"Cound not select all anchors\tnum_anchor:%d\t numseq:%d",num_anchor,msa->numseq);
