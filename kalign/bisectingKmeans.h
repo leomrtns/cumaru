@@ -28,5 +28,5 @@
 #include "alignment_parameters.h"
 #include "sequence_distance.h"
 
-extern int build_tree_kmeans(struct msa* msa, struct aln_param* ap);
+void build_tree_kmeans(struct msa* msa, struct aln_param* ap);
 #endif

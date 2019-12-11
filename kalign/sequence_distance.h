@@ -26,6 +26,6 @@
 #include "global.h"
 #include "alignment_parameters.h"
 
-extern float** d_estimation(struct msa* msa, int* samples, int num_samples,int pair);
+extern float** d_estimation (struct msa* msa, uint32_t* samples, uint32_t num_samples, int pair);
 
 #endif

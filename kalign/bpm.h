@@ -31,10 +31,7 @@
 
 /* Must be called before bpm_256!!!!  */
 extern void set_broadcast_mask(void);
-
-extern uint8_t bpm_256(const uint8_t* t,const uint8_t* p,int n,int m);
-extern uint8_t bpm(const uint8_t* t,const uint8_t* p,int n,int m);
-
-
+uint8_t bpm_256 (const uint8_t* t,const uint8_t* p, uint32_t n, uint32_t m);
+uint8_t bpm (const uint8_t* t,const uint8_t* p, uint32_t n, uint32_t m);
 
 #endif

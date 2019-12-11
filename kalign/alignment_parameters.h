@@ -37,7 +37,7 @@ struct msa {
   struct msa_seq** sequences;
   int** sip;
   int* nsip;
-  int* plen;
+  uint32_t* plen;
   uint32_t numseq;
   uint32_t num_profiles;
 };
@@ -48,7 +48,7 @@ struct aln_param {
   float gpo;
   float gpe;
   float tgpe;
-  int* tree;
+  uint32_t* tree;
 };
 
 struct alphabet {
@@ -65,25 +65,20 @@ char_vector aligned_msa_to_charvector (struct msa* msa);
 struct aln_param* init_ap (int numseq);
 void free_ap (struct aln_param* ap);
 struct alphabet* create_dna_alphabet (void);
-uint32_t* pick_anchor (struct msa* msa, int* n);
+uint32_t* pick_anchor (struct msa* msa, uint32_t* n);
 int make_aliged_seq (uint8_t* aligned, uint8_t* unaligned, int* gaps,int len);
 
 void convert_msa_to_internal(struct msa* msa);/* convert */
 int write_msa(struct msa* msa, char* outfile, int type);
 void free_msa(struct msa* msa);
 
-int weave(struct msa* msa, int** map, int* tree);
+void weave (struct msa* msa, int** map, uint32_t* tree);
 int clean_aln(struct msa* msa);
 // euclidean_distance.h
 extern  int edist_256(const float* a,const float* b, const int len, float* ret);
 extern int edist_serial(const float* a,const float* b,const int len, float* ret);
 extern int edist_serial_d(const double* a,const double* b,const int len, double* ret);
 
-
-extern int byg_detect(uint8_t* text,int n);
-extern int byg_start(char* pattern,char*text);
-extern int byg_end(char* pattern,char*text);
-extern int byg_count(char* pattern,char*text);
 extern int shuffle_arr_r(int* arr,int n, struct rng_state* rng);
 /* Steinegger, Martin, and Johannes Söding. "Clustering huge protein sequence sets in linear time." Nature communications 9.1 (2018): 2542. */
 // (c) 2017 Johannes Soeding & Martin Steinegger, Gnu Public License version 3

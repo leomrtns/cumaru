@@ -45,7 +45,6 @@ del_arg_parameters (arg_parameters params)
 void 
 print_usage (arg_parameters params, char *progname)
 {
-  int i;
   if (params.version->count) { printf ("%s\n", PACKAGE_VERSION); del_arg_parameters (params); exit (EXIT_SUCCESS); }
   if (!params.end->count && (!params.help->count)) return;
 

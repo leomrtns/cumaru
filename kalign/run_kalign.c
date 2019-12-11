@@ -27,10 +27,10 @@ char_vector kalign3_from_char_vector (char_vector dna)
   msa = read_char_vector_to_msa (dna);
   ap = init_ap (msa->numseq);/* allocate aln parameters  */
   /* Start bi-secting K-means sequence clustering */
-  build_tree_kmeans(msa,ap);
+  build_tree_kmeans (msa, ap);
   /* Start alignment stuff */
   map = hirschberg_alignment(msa, ap);
-  weave(msa , map, ap->tree); /* it's aligned already */
+  weave (msa, map, ap->tree); /* it's aligned already */
   /* clean up map */
   for (i = 0; i < msa->num_profiles ;i++) if(map[i]) free (map[i]); 
   if (map) free (map);

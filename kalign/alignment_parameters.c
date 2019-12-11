@@ -43,9 +43,7 @@ void free_msa_seq(struct msa_seq* seq);
 struct line_buffer* alloc_line_buffer(int max_line_len);
 int resize_line_buffer(struct line_buffer* lb);
 void free_line_buffer(struct line_buffer* lb);
-static int set_sip_nsip(struct msa* msa);/* local helper functions  rwalign */
-static int sort_out_lines(const void *a, const void *b);
-static int make_linear_sequence(struct msa_seq* seq, char* linear_seq);
+static void set_sip_nsip(struct msa* msa);/* local helper functions  rwalign */
 /* end rwalign.c */
 
 struct aln_param* init_ap (int numseq)
@@ -53,8 +51,7 @@ struct aln_param* init_ap (int numseq)
   struct aln_param* ap =  (struct aln_param*) biomcmc_malloc (sizeof(struct aln_param));
   int i,j;
 
-  ap->tree = NULL;
-  ap->tree = (int*) biomcmc_malloc (sizeof(int) * (numseq*3+1));
+  ap->tree = (uint32_t*) biomcmc_malloc (sizeof(uint32_t) * (numseq*3+1));
 
   for(i = 0;i < (numseq*3+1);i++) ap->tree[i] = 0;
 
@@ -79,7 +76,7 @@ void free_ap (struct aln_param* ap)
     MFREE(ap->subm);
   }
   if(ap->rng) free_rng(ap->rng);
-  if(ap->tree) MFREE(ap->tree);
+  if(ap->tree) free (ap->tree);
   MFREE(ap);
 }
 
@@ -179,11 +176,9 @@ int clean_and_set_to_extern (struct alphabet* a)
 
 // pick_anchor.c
 
-uint32_t* pick_anchor(struct msa* msa, int* n)
+uint32_t* pick_anchor(struct msa* msa, uint32_t* n)
 {
-  uint32_t* anchors = NULL;
-  int num_anchor = 0;
-  uint32_t powlog2;
+  uint32_t* anchors = NULL, num_anchor = 0, powlog2;
   ASSERT(msa != NULL, "No alignment.");
   powlog2 = (uint32_t) pow(log2((double) msa->numseq), 2.0);
   num_anchor = MAX(MIN(32, msa->numseq), powlog2);
@@ -227,7 +222,7 @@ int sort_by_len(const void *a, const void *b)
 struct msa* read_char_vector_to_msa (char_vector dna) 
 {
   struct msa* msal = (struct msa*) biomcmc_malloc (sizeof (struct msa));
-  int i;
+  uint32_t i;
   msal->sequences = NULL;
   msal->numseq = dna->nstrings;
   msal->plen = NULL;
@@ -240,9 +235,9 @@ struct msa* read_char_vector_to_msa (char_vector dna)
   return msal;
 }
 
-int set_sip_nsip(struct msa* msa)
+void set_sip_nsip (struct msa* msa)
 {
-  int i;
+  uint32_t i;
   ASSERT(msa!= NULL, "No msa");
   if(msa->plen){
     for (i = msa->num_profiles;i--;) if(msa->sip[i]) MFREE(msa->sip[i]);
@@ -255,24 +250,19 @@ int set_sip_nsip(struct msa* msa)
   }
 
   msa->num_profiles = (msa->numseq << 1 ) - 1;
-  MMALLOC(msa->sip,sizeof(int*)* msa->num_profiles);
-  MMALLOC(msa->nsip,sizeof(int)* msa->num_profiles);
-  MMALLOC(msa->plen,sizeof(int)* msa->num_profiles);
-
-  for (i =0;i < msa->num_profiles;i++){
+  msa->sip = (int**) biomcmc_malloc (sizeof(int*) * msa->num_profiles);
+  msa->nsip = (int*) biomcmc_malloc (sizeof(int) * msa->num_profiles);
+  msa->plen = (uint32_t*) biomcmc_malloc (sizeof(uint32_t) * msa->num_profiles);
+  for (i =0; i < msa->num_profiles; i++){
     msa->sip[i] = NULL;
     msa->nsip[i] = 0;
   }
-
-  for(i = 0;i < msa->numseq;i++) {
-    MMALLOC(msa->sip[i],sizeof(int));
+  for(i = 0; i < msa->numseq; i++) {
+    msa->sip[i] = (int*) biomcmc_malloc (sizeof(int) * msa->num_profiles);
     msa->nsip[i] = 1;
     msa->sip[i][0] = i;
     msa->plen[i] = 0;
   }
-  return OK;
-ERROR:
-  return FAIL;
 }
 
 void convert_msa_to_internal (struct msa* msa)
@@ -280,7 +270,7 @@ void convert_msa_to_internal (struct msa* msa)
   struct alphabet* a = NULL;
   struct msa_seq* seq = NULL;
   int8_t* t = NULL;
-  int i,j;
+  uint32_t i, j;
 
   a = create_dna_alphabet();
   t = a->to_internal;
@@ -296,27 +286,6 @@ void convert_msa_to_internal (struct msa* msa)
     }
   }
   if (a) free (a);
-}
-
-int make_linear_sequence(struct msa_seq* seq, char* linear_seq)
-{
-  int c,j,f;
-  f = 0;
-  for(j = 0;j < seq->len;j++){
-    for(c = 0;c < seq->gaps[j];c++){
-      linear_seq[f] = '-';
-      f++;
-
-    }
-    linear_seq[f] = seq->seq[j];
-    f++;
-  }
-  for(c = 0;c < seq->gaps[ seq->len];c++){
-    linear_seq[f] = '-';
-    f++;
-  }
-  linear_seq[f] = 0;
-  return OK;
 }
 
 char_vector aligned_msa_to_charvector (struct msa* msa)
@@ -338,6 +307,7 @@ char_vector aligned_msa_to_charvector (struct msa* msa)
     }
     for (c = 0; c < msa->sequences[i]->gaps[j]; c++) aligned->string[id][f++] = '-';
   }
+  return aligned;
 }
 
 void free_msa (struct msa* msa)
@@ -355,13 +325,13 @@ void free_msa (struct msa* msa)
 struct msa_seq* msa_seq_from_char_vector_string (char *string, size_t nchars, uint32_t id)
 {
   struct msa_seq* seq = (struct msa_seq*) biomcmc_malloc (sizeof (struct msa_seq));
-  int i;
+  size_t i;
   seq->id = id;
   seq->len = 0;
   nchars++; // we incorporate null_terminate_sequences() whereby we add final 0
 
   seq->seq  = (char*) biomcmc_malloc (sizeof(char) * nchars);
-  seq->gaps = (int*) biomcmc_malloc (sizeof(int) * (nchars + 1)); // in kalign3 it's one more than the dna (to allow trailing indels?)
+  seq->gaps = (uint32_t*) biomcmc_malloc (sizeof(uint32_t) * (nchars + 1)); // in kalign3 it's one more than the dna (to allow trailing indels?)
   for(i = 0;i < nchars + 1; i++) seq->gaps[i] = 0;
   for(i = 0;i < nchars - 1; i++) { // minus one since we added one 
     if( isalpha((int) string[i])) seq->seq[seq->len++] = string[i];
@@ -370,7 +340,7 @@ struct msa_seq* msa_seq_from_char_vector_string (char *string, size_t nchars, ui
   seq->seq[seq->len] = 0; // null_terminate_sequences() in kalign3
   if (seq->len < nchars - 1) {
     seq->seq  = (char*) biomcmc_realloc ((char*)seq->seq, sizeof(char) * seq->len + 1);
-    seq->gaps = (int*)  biomcmc_realloc ((int*)seq->gaps, sizeof(int) * (nchars + 2)); // in kalign3 it's one more than the dna (to allow trailing indels?)
+    seq->gaps = (uint32_t*)  biomcmc_realloc ((uint32_t*)seq->gaps, sizeof(uint32_t) * (nchars + 2)); // in kalign3 it's one more than the dna (to allow trailing indels?)
   }
   seq->s  = (uint8_t*) biomcmc_malloc (sizeof(uint8_t) * seq->len + 1);
   return seq;
@@ -450,45 +420,29 @@ void free_line_buffer(struct line_buffer* lb)
   }
 }
 
-
-int sort_out_lines(const void *a, const void *b)
-{
-  struct out_line* const *one = a;
-  struct out_line* const *two = b;
-  if((*one)->block > (*two)->block) {
-    return 1;
-  } else if((*one)->block == (*two)->block) {
-    if((*one)->seq_id > (*two)->seq_id) {
-      return 1;
-    } else if((*one)->seq_id == (*two)->seq_id) {
-      return 0;
-    } else{ return -1; }
-  } else{ return -1;  }
-}
-
 // weave_alignment.c
 
-void make_seq (struct msa* msa,int a,int b,int* path);
-int update_gaps (int old_len,int*gis,int new_len,int *newgaps);
+void make_seq (struct msa* msa, uint32_t a, uint32_t b, int* path);
+int update_gaps (uint32_t old_len, uint32_t *gis, uint32_t *newgaps);
 
-int weave(struct msa* msa, int** map, int* tree)
+void weave (struct msa* msa, int** map, uint32_t* tree)
 {
-  int i, a,b;
+  uint32_t i, a,b; 
   for (i = 0; i < (msa->numseq-1)*3;i +=3){
     a = tree[i];
     b = tree[i+1];
-    make_seq(msa,a,b,map[tree[i+2]]);
+    make_seq (msa, a, b, map[tree[i+2]]);
   }
 }
 
-void make_seq (struct msa* msa,int a,int b,int* path)
+void make_seq (struct msa* msa, uint32_t a, uint32_t b, int* path)
 {
-  int *gap_a, *gap_b, i, c, posa = 0, posb = 0;
+  uint32_t i, *gap_a, *gap_b, c, posa = 0, posb = 0;
 
-  gap_a = (int*) biomcmc_malloc ((path[0]+1)*sizeof(int));
-  gap_b = (int*) biomcmc_malloc ((path[0]+1)*sizeof(int));
+  gap_a = (uint32_t*) biomcmc_malloc ((path[0]+1)*sizeof(uint32_t));
+  gap_b = (uint32_t*) biomcmc_malloc ((path[0]+1)*sizeof(uint32_t));
 
-  for (i = path[0]+1;i--;) gap_a[i] = gap_b[i] = 0;
+  for (c = (uint32_t) (path[0] + 1); c--;) gap_a[c] = gap_b[c] = 0;
   c = 1;
   while(path[c] != 3) {
     if (!path[c]) {
@@ -505,20 +459,18 @@ void make_seq (struct msa* msa,int a,int b,int* path)
     }
     c++;
   }
-  for (i = msa->nsip[a];i--;) update_gaps(msa->sequences[msa->sip[a][i]]->len, msa->sequences[msa->sip[a][i]]->gaps, path[0], gap_a);
-  for (i = msa->nsip[b];i--;) update_gaps(msa->sequences[msa->sip[b][i]]->len, msa->sequences[msa->sip[b][i]]->gaps, path[0], gap_b);
+  for (i = msa->nsip[a]; i--;) update_gaps (msa->sequences[msa->sip[a][i]]->len, msa->sequences[msa->sip[a][i]]->gaps, gap_a);
+  for (i = msa->nsip[b]; i--;) update_gaps (msa->sequences[msa->sip[b][i]]->len, msa->sequences[msa->sip[b][i]]->gaps, gap_b);
   if (gap_a) free (gap_a);
   if (gap_b) free (gap_b);
 }
 
-int update_gaps (int old_len,int*gis,int new_len,int *newgaps)
+int update_gaps (uint32_t old_len, uint32_t *gis, uint32_t *newgaps)
 {
-  unsigned int i,j;
-  int add = 0;
-  int rel_pos = 0;
-  for (i = 0; i <= old_len;i++){
+  uint32_t i, j, add = 0, rel_pos = 0;
+  for (i = 0; i <= old_len; i++){
     add = 0;
-    for (j = rel_pos;j <= rel_pos + gis[i];j++) if (newgaps[j] != 0) add += newgaps[j];
+    for (j = rel_pos; j <= rel_pos + gis[i]; j++) if (newgaps[j] != 0) add += newgaps[j];
     rel_pos += gis[i]+1;
     gis[i] += add;
   }
@@ -598,96 +550,6 @@ float hsum_ps_sse3(__m128 v)
 }
 
 #endif
-// misc.c
-
-int byg_detect(uint8_t* text,int n)
-{
-  int Tc;
-  int i  = 0;
-  int s = 0;
-  int T[256];
-  for (i = 0;i < 256;i++) T[i] = 0;
-  int mb = 1;
-  char *unique_aa = "BDEFHIJKLMNOPQRSVWYZ";//restrictive
-  int aacode[26] = {0,1,2,3,4,5,6,7,8,-1,9,10,11,12,23,13,14,15,16,17,17,18,19,20,21,22};
-  for (i= 0;i < 20;i++){
-    T[(int)aacode[unique_aa[i]-65]] |= 1;
-  }
-  for (i = 0;i < n;i++) if(text[i] != -1){
-    s <<= 1;
-    s |= 1;
-    Tc = T[text[i]];
-    s &= Tc;
-    if(s & mb) return 0;
-  }
-  return 1;
-}
-
-int byg_count(char* pattern,char*text)
-{
-  int Tc;
-  int count = 0;
-  int i  = 0;
-  int s = 0;
-  int T[256];
-  for (i = 0;i < 256;i++) T[i] = 0;
-  int m = strlen(pattern);
-  int n = strlen (text);
-  int mb = (1 << (m-1));
-  for (i= 0;i < m;i++) T[(int)pattern[i]] |= (1 << i);
-  for (i = 0;i < n;i++){
-    s <<= 1;
-    s |= 1;
-    Tc = T[(int)text[i]];
-    s &= Tc;
-    if(s & mb) count++;
-  }
-  return count;
-}
-
-int byg_end(char* pattern,char*text)
-{
-  int Tc;
-  int i  = 0;
-  int s = 0;
-  int T[256];
-  for (i = 0;i < 256;i++) T[i] = 0;
-  int m = strlen(pattern);
-  int n = strlen (text);
-  int mb = (1 << (m-1));
-  for (i= 0;i < m;i++) T[(int)pattern[i]] |= (1 << i);
-  for (i = 0;i < n;i++){
-    s <<= 1;
-    s |= 1;
-    if(!text[i]) return -1;
-    Tc = T[(int)text[i]];
-    s &= Tc;
-    if(s & mb) return i+1;
-  }
-  return -1;
-}
-
-int byg_start(char* pattern,char*text)
-{
-  int Tc;
-  int i  = 0;
-  int s = 0;
-  int T[256];
-  for (i = 0;i < 256;i++) T[i] = 0;
-  int m = strlen(pattern);
-  int n = strlen(text);
-  int mb = (1 << (m-1));
-  for (i= 0;i < m;i++) T[(int)pattern[i]] |= (1 << i);
-  for (i = 0;i < n;i++) {
-    s <<= 1;
-    s |= 1;
-    Tc = T[(int)text[i]];
-    s &= Tc;
-    if(s & mb) return i-m+1;
-    if(i == 100) return -1;
-  }
-  return -1;
-}
 
 // (c) 2017 Johannes Soeding & Martin Steinegger, Gnu Public License version 3
 // Rotate left macro: left circular shift by numbits within 16 bits

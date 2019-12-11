@@ -20,24 +20,23 @@ struct bignode{
 
 struct bignode* big_insert_hash(struct bignode *n,const unsigned int pos);
 void big_remove_nodes(struct bignode *n);
-float calc_distance(uint8_t* seq_a, uint8_t* seq_b, int len_a,int len_b);
-float dna_distance_calculation(struct bignode* hash[],const uint8_t * p,const int seqlen,int diagonals,float mode);
+float calc_distance (uint8_t* seq_a, uint8_t* seq_b, uint32_t len_a, uint32_t len_b);
+float dna_distance_calculation(struct bignode* hash[],const uint8_t * p,const uint32_t seqlen, uint32_t diagonals, float mode);
 
-float** d_estimation (struct msa* msa, int* samples, int num_samples,int pair)
+float** d_estimation (struct msa* msa, uint32_t* samples, uint32_t num_samples,int pair)
 {
   float** dm = NULL;
   uint8_t* seq_a;
   uint8_t* seq_b;
   float dist;
-  int len_a;
-  int len_b;
-  int i,j;
+  uint32_t len_a, len_b, i, j;
 #if HAVE_AVX2
   set_broadcast_mask();
 #endif
 
   if(pair){
-    dm = galloc(dm,num_samples,num_samples,0.0f);
+    // dm = galloc(dm, num_samples, num_samples, 0.0f); // DEBUG (-g -Wall) doesn't like _Generic()...
+    dm = alloc_2D_array_size_float (dm, num_samples, num_samples, 0.0f);
     for(i = 0; i < num_samples;i++){
       seq_a = msa->sequences[samples[i]]->s;// aln->s[samples[i]];
       len_a = msa->sequences[samples[i]]->len;//aln->sl[samples[i]];
@@ -50,17 +49,16 @@ float** d_estimation (struct msa* msa, int* samples, int num_samples,int pair)
       }
     }
   } else {
-    int a;
-    int numseq = msa->numseq;
+    uint32_t a, numseq = msa->numseq;
     dm = (float**) biomcmc_malloc (sizeof(float*) * numseq);
     a = num_samples / 8;
-    if( num_samples%8) a++;
+    if (num_samples%8) a++;
     a = a << 3;
 
-    for(i = 0; i < numseq;i++) {
+    for(i = 0; i < numseq; i++) {
       dm[i] = NULL;
       dm[i] = _mm_malloc(sizeof(float) * a,32);
-      for(j = 0; j < a;j++) dm[i][j] = 0.0f;
+      for(j = 0; j < a; j++) dm[i][j] = 0.0f;
     }
 
     for(i = 0; i < numseq;i++){
@@ -77,23 +75,20 @@ float** d_estimation (struct msa* msa, int* samples, int num_samples,int pair)
   return dm;
 }
 
-float calc_distance(uint8_t* seq_a, uint8_t* seq_b, int len_a,int len_b)
+float calc_distance(uint8_t* seq_a, uint8_t* seq_b, uint32_t len_a, uint32_t len_b)
 {
 #ifdef HAVE_AVX2
   uint8_t dist;
-  if (len_a > len_b) {
-    dist = bpm_256(seq_a, seq_b, len_a, len_b);
-  } else {
-    dist = bpm_256(seq_b, seq_a, len_b, len_a);
-  }
+  if (len_a > len_b) dist = bpm_256 (seq_a, seq_b, len_a, len_b);
+  else               dist = bpm_256 (seq_b, seq_a, len_b, len_a);
   return (float) dist;
 #else
   struct bignode* hash[1024];
-  int i;
+  uint32_t i;
   float dist;
   unsigned int hv;
   for (i = 0;i < 1024;i++) hash[i] = 0;
-  for (i = len_a-5;i--;){
+  for (i = len_a-5; i--;){
     hv = ((seq_a[i]&3)<<8) + ((seq_a[i+1]&3)<<6) + ((seq_a[i+2]&3)<<4) + ((seq_a[i+3]&3)<<2) + (seq_a[i+4]&3);//ABCDE
     hash[hv] = big_insert_hash(hash[hv],i);
     hv = ((seq_a[i]&3)<<8) + ((seq_a[i+1]&3)<<6) + ((seq_a[i+2]&3)<<4) + ((seq_a[i+3]&3)<<2) + (seq_a[i+5]&3);//ABCDF
@@ -115,16 +110,16 @@ float calc_distance(uint8_t* seq_a, uint8_t* seq_b, int len_a,int len_b)
 #endif
 }
 
-float dna_distance_calculation (struct bignode* hash[], const uint8_t * p, const int seqlen, int diagonals, float mode)
+float dna_distance_calculation (struct bignode* hash[], const uint8_t * p, const uint32_t seqlen, uint32_t diagonals, float mode)
 {
   struct bignode* node_p;
   float out = 0.0;
   unsigned int* tmp = NULL;
   unsigned int* d = NULL;
-  int i,j;
+  uint32_t i,j;
   unsigned int hv;
 
-  d = biomcmc_malloc (sizeof(int) * diagonals);
+  d = (unsigned int*) biomcmc_malloc (sizeof(unsigned int) * diagonals);
   for (i = 0; i < diagonals; i++) d[i] = 0;
   for (i = seqlen-5;i--;){
     hv = ((p[i]&3)<<8) + ((p[i+1]&3)<<6) + ((p[i+2]&3)<<4)  + ((p[i+3]&3)<<2) + (p[i+4]&3);//ABCDE
