@@ -1,38 +1,20 @@
-/*
-  Kalign - a multiple sequence alignment program
-
-  Copyright 2006, 2019 Timo Lassmann
-
-  This file is part of kalign.
-
-  Kalign is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+/* SPDX-License-Identifier: GPL-3.0-or-later
+ * Copyright (C) 2019-today  Leonardo de Oliveira Martins [ leomrtns at gmail.com;  http://www.leomartins.org ]
+ * 
+ * This file is based on the Kalign3  program, commit 
+ * [7b3395a30d](https://github.com/TimoLassmann/kalign/tree/7b3395a30d60e994c9f2101bd2055cc3a426b7f7).
+ * TimoLassmann/kalign is licensed under the GNU General Public License v3.0 or later.
  */
 
 #include "bpm.h"
 #include  <stdalign.h>
-
 #include "rng.h"
 
 #ifdef HAVE_AVX2
 #include <immintrin.h>
-
 __m256i BROADCAST_MASK[16];
-
 void bitShiftLeft256ymm (__m256i *data, int count);
 __m256i bitShiftRight256ymm (__m256i *data, int count);
-
 /* taken from Alexander Yee: http://www.numberworld.org/y-cruncher/internals/addition.html#ks_add */
 __m256i add256(uint32_t carry, __m256i A, __m256i B);
 #endif

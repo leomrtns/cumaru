@@ -84,9 +84,11 @@ main (int argc, char **argv)
   }
   kseq_destroy(seq);
   gzclose(fp);
-  time1 = clock (); fprintf (stderr, "read : %lf\n",  (double)(time1-time0)/(double)(CLOCKS_PER_SEC)); fflush(stderr); 
+  time1 = clock (); fprintf (stderr, "read in  %lf secs\n",  (double)(time1-time0)/(double)(CLOCKS_PER_SEC)); fflush(stderr); 
 
   align = kalign3_from_char_vector (dna);
+
+  time1 = clock (); fprintf (stderr, "finished in  %lf secs\n",  (double)(time1-time0)/(double)(CLOCKS_PER_SEC)); fflush(stderr); 
   for (i= 0; i < align->nstrings; i++) printf (">%s\n%s\n", seqname->string[i], align->string[i]);
 
   del_char_vector (dna);
