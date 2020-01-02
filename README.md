@@ -1,4 +1,4 @@
-# cumaru
+![Cumaru](recipe/cumaru-text.png)
 Dna multiple sequence alignment
 
 
