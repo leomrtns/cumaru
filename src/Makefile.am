@@ -1,6 +1,6 @@
 AM_CPPFLAGS = $(GTKDEPS_CFLAGS) -I$(srcdir)/../kalign -I$(srcdir)/../@BIOMCMCLIB@/lib @OPENMP_CPPFLAGS@  @ZLIB_LIBS@ 
 AM_CFLAGS = @AM_CFLAGS@ @OPENMP_CFLAGS@ @CHECK_CFLAGS@
-LDADD = $(GTKDEPS_LIBS) @CHECK_LIBS@  ../kalign/libkalign.la ../biomcmc-lib/lib/libbiomcmc.la @ZLIB_LIBS@  $(AM_LDFLAGS)
+LDADD = $(GTKDEPS_LIBS) @CHECK_LIBS@  ../kalign/libkalign.la ../biomcmc-lib/lib/libbiomcmc_static.la @ZLIB_LIBS@  $(AM_LDFLAGS)
 
 bin_PROGRAMS = cumaru 
 cumaru_SOURCES = main.c kseq.h
