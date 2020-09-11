@@ -19,19 +19,15 @@
 #include "config.h"
 #endif
 
-#define MSA_NAME_LEN 128
-#define FORMAT_FA 1
-#define FORMAT_MSF 2
-#define FORMAT_CLU 3
 #define defPROTEIN 21
 #define redPROTEIN 13
 #define defDNA 5
 
 
 struct msa_seq {
-  char* seq;
+  char* seq;   // original (string) representation of sequence
   uint32_t id; // leo: we don't store seq names here, external char_vector should have it
-  uint8_t* s;
+  uint8_t* s;  // compact representation of sequence
   uint32_t* gaps;
   uint32_t len;
 };

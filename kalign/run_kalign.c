@@ -31,7 +31,7 @@ char_vector kalign3_from_char_vector (char_vector dna)
   ap = init_ap (msa->numseq);/* allocate aln parameters  */
   /* Start bi-secting K-means sequence clustering */
   build_tree_kmeans (msa, ap);
-  /* Start alignment stuff */
+  /* Start alignment stuff */ // PROTEIN (i.e. kmeans use reduced but hirschberg used full a.a. table)
   map = hirschberg_alignment(msa, ap);
   weave (msa, map, ap->tree); /* it's aligned already */
   /* clean up map */
