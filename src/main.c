@@ -1,5 +1,7 @@
 #include <kalign.h>
 #include "kseq.h"
+#include <gap_affine/affine_wavefront_align.h>
+
 KSEQ_INIT(gzFile, gzread)
 
 typedef struct

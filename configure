@@ -14709,7 +14709,7 @@ subdirs="$subdirs biomcmc-lib"
 
 BIOMCMCLIB=biomcmc-lib
 
-ac_config_files="$ac_config_files Makefile src/Makefile kalign/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile kalign/Makefile WFA/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -15734,6 +15734,7 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "kalign/Makefile") CONFIG_FILES="$CONFIG_FILES kalign/Makefile" ;;
+    "WFA/Makefile") CONFIG_FILES="$CONFIG_FILES WFA/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

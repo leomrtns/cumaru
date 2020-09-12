@@ -9,7 +9,7 @@ AC_CONFIG_MACRO_DIR([m4])
 CFLAGS=${CFLAGS-""}  # Override default O2
 CXXFLAGS=${CXXFLAGS-""}
 
-AM_INIT_AUTOMAKE([-Wall -Werror]) # automake initialization (completely unrelated to compiler arguments)
+AM_INIT_AUTOMAKE([subdir-objects -Wall -Werror]) # automake initialization (completely unrelated to compiler arguments)
 AC_USE_SYSTEM_EXTENSIONS
 AM_MAINTAINER_MODE
 dnl must be called after AC_USE_SYSTEM_EXTENSIONS (new restriction in autoconf2.68) 
@@ -74,7 +74,7 @@ dnl Call biomcmc-lib ./configure script recursively.
 AC_CONFIG_SUBDIRS([biomcmc-lib])
 AC_SUBST([BIOMCMCLIB], [biomcmc-lib])
 dnl generate makefiles (last recipes, after defining CFLAGS etc.)
-AC_CONFIG_FILES([ Makefile src/Makefile kalign/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile kalign/Makefile WFA/Makefile])
 AC_OUTPUT
 
 echo \
