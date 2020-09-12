@@ -90,6 +90,7 @@ main (int argc, char **argv)
 
   time1 = clock (); fprintf (stderr, "finished in  %lf secs\n",  (double)(time1-time0)/(double)(CLOCKS_PER_SEC)); fflush(stderr); 
   for (i= 0; i < align->nstrings; i++) printf (">%s\n%s\n", seqname->string[i], align->string[i]);
+  //save_gzfasta_from_char_vector ("o.fas.gz", seqname, align);
 
   del_char_vector (dna);
   del_char_vector (align);
