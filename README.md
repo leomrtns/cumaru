@@ -1,4 +1,4 @@
-![Cumaru](recipe/cumaru-text.png)
+<img src="recipe/cumaru-text.png" height="100" alt="Cumaru">
 DNA/protein multiple sequence alignment
 
 
