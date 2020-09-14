@@ -111,8 +111,9 @@ PROGRAMS = $(bin_PROGRAMS)
 am_cumaru_OBJECTS = main.$(OBJEXT)
 cumaru_OBJECTS = $(am_cumaru_OBJECTS)
 am__DEPENDENCIES_1 =
-am__DEPENDENCIES_2 = ../WFA/libwfa.la ../kalign/libkalign.la \
-	../biomcmc-lib/lib/libbiomcmc_static.la $(am__DEPENDENCIES_1)
+am__DEPENDENCIES_2 = ../submodules/WFA/libwfa.la \
+	../kalign/libkalign.la ../biomcmc-lib/lib/libbiomcmc_static.la \
+	$(am__DEPENDENCIES_1)
 cumaru_DEPENDENCIES = $(am__DEPENDENCIES_2)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -319,8 +320,8 @@ top_srcdir = @top_srcdir@
 
 # "-I$(srcdir)/.." means that I must "include <WFA/gap_affine/>" etc (i.e. the WFA dir is needed)
 # "-I$(srcdir)/../kalign"  means that "include <kalign.h>" works
-AM_CPPFLAGS = $(GTKDEPS_CFLAGS) -I$(srcdir)/../WFA -I$(srcdir)/../kalign -I$(srcdir)/../@BIOMCMCLIB@/lib @OPENMP_CPPFLAGS@  @ZLIB_LIBS@ 
-LDADD = $(GTKDEPS_LIBS) @CHECK_LIBS@  ../WFA/libwfa.la ../kalign/libkalign.la ../biomcmc-lib/lib/libbiomcmc_static.la @ZLIB_LIBS@  $(AM_LDFLAGS)
+AM_CPPFLAGS = $(GTKDEPS_CFLAGS) -I$(srcdir)/../submodules/WFA -I$(srcdir)/../kalign -I$(srcdir)/../@BIOMCMCLIB@/lib @OPENMP_CPPFLAGS@  @ZLIB_LIBS@ 
+LDADD = $(GTKDEPS_LIBS) @CHECK_LIBS@  ../submodules/WFA/libwfa.la ../kalign/libkalign.la ../biomcmc-lib/lib/libbiomcmc_static.la @ZLIB_LIBS@  $(AM_LDFLAGS)
 cumaru_SOURCES = main.c kseq.h
 cumaru_LDADD = $(LDADD)
 all: config.h
