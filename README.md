@@ -1,12 +1,12 @@
 <img src="recipe/cumaru-text.png" height="100" alt="Cumaru written in stylised fonts">
 DNA/protein multiple sequence alignment
 
+<img src="recipe/cumaru-logo.png" height="100" align="right" alt="AI drawing of a tree">
 
 __Leonardo de Oliveira Martins<sup>1</sup>__
 <br>
 <sub>1. Quadram Institute Bioscience, Norwich Research Park, NR4 7UQ, UK</sub>
 
-<img src="recipe/cumaru-logo.png" height="200" align="right" alt="AI drawing of a tree">
 
 ## License
 SPDX-License-Identifier: GPL-3.0-or-later
